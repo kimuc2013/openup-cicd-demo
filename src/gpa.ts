@@ -23,38 +23,40 @@ export interface GpaResult {
   earnedCredits: number;  // 취득 학점 수
 }
 
+const GRADE_POINTS: Readonly<Record<Grade, number>> = {
+  'A+': 4.5,
+  A0: 4.0,
+  'B+': 3.5,
+  B0: 3.0,
+  'C+': 2.5,
+  C0: 2.0,
+  'D+': 1.5,
+  D0: 1.0,
+  F: 0,
+  P: 0,
+  NP: 0,
+};
+
 // 등급을 평점으로 바꾼다
 export function gradeToPoint(grade: string): number {
-  if (grade == 'A+') {
-    return 4.5;
-  } else if (grade == 'A0') {
-    return 4.0;
-  } else if (grade == 'B+') {
-    return 3.5;
-  } else if (grade == 'B0') {
-    return 3.0;
-  } else if (grade == 'C+') {
-    return 2.5;
-  } else if (grade == 'C0') {
-    return 2.0;
-  } else if (grade == 'D+') {
-    return 1.5;
-  } else if (grade == 'D0') {
-    return 1.0;
-  } else {
-    return 0;
-  }
+  return Object.prototype.hasOwnProperty.call(GRADE_POINTS, grade)
+    ? GRADE_POINTS[grade as Grade]
+    : 0;
 }
 
 // 재수강한 과목은 마지막 기록만 남긴다
 function removeRetakes(courses: Course[]): Course[] {
-  return courses.filter(
-    (course, index) => !courses.slice(index + 1).some((later) => later.name == course.name)
-  );
+  const latestCourses = new Map<string, Course>();
+
+  for (const course of courses) {
+    latestCourses.delete(course.name);
+    latestCourses.set(course.name, course);
+  }
+
+  return Array.from(latestCourses.values());
 }
 
 // 과목 목록을 받아 평점 평균과 학점 수를 계산한다
-
 export function calculateGpa(courses: Course[]): GpaResult {
   const finalCourses = removeRetakes(courses);
 
@@ -82,4 +84,3 @@ export function calculateGpa(courses: Course[]): GpaResult {
 
   return { gpa, gradedCredits, earnedCredits };
 }
-
