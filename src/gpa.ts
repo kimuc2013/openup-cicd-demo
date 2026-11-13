@@ -54,6 +54,7 @@ function removeRetakes(courses: Course[]): Course[] {
 }
 
 // 과목 목록을 받아 평점 평균과 학점 수를 계산한다
+
 export function calculateGpa(courses: Course[]): GpaResult {
   const finalCourses = removeRetakes(courses);
 
@@ -62,15 +63,23 @@ export function calculateGpa(courses: Course[]): GpaResult {
   let earnedCredits = 0;
 
   for (const course of finalCourses) {
-    totalPoints += course.credits * gradeToPoint(course.grade);
-    gradedCredits += course.credits;
-    if (course.grade != 'F' && course.grade != 'NP') {
+    // P, NP는 평점 계산에서 제외
+    if (course.grade !== 'P' && course.grade !== 'NP') {
+      totalPoints += course.credits * gradeToPoint(course.grade);
+      gradedCredits += course.credits;
+    }
+
+    // F, NP는 취득 학점에서 제외
+    if (course.grade !== 'F' && course.grade !== 'NP') {
       earnedCredits += course.credits;
     }
   }
 
-  // 소수 둘째 자리까지 표시한다
-  const gpa = Math.floor((totalPoints / gradedCredits) * 100) / 100;
+  // 평점 대상이 없으면 null, 있으면 반올림
+  const gpa = gradedCredits === 0
+    ? null
+    : Math.round((totalPoints / gradedCredits) * 100) / 100;
 
   return { gpa, gradedCredits, earnedCredits };
 }
+
