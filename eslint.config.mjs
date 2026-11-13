@@ -30,11 +30,11 @@ export default defineConfig(
       //    관문(error)으로 올려야 CI가 실제로 막아 줍니다.
 
       // ==, != 대신 ===, !== 를 쓰도록 강제 (타입 변환 때문에 생기는 버그 예방)
-      eqeqeq: 'warn',
+      eqeqeq: 'error',
 
       // 함수 하나의 분기(if, else if, &&, || 등) 수가 너무 많으면 경고
       // 분기가 많을수록 읽기 어렵고 테스트하기 어렵습니다.
-      complexity: ['warn', { max: 8 }],
+      complexity: ['error', { max: 8 }],
     },
   },
 );
